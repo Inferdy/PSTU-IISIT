@@ -4,7 +4,7 @@
     {
         public readonly string ReverseValue;
 
-        public TwoHeadedRule(IRulePart rootRulePart, string name, string directValue, string reverseValue) : base(rootRulePart, name, directValue)
+        public TwoHeadedRule(IRulePart rootRulePart, string name, string directValue, string reverseValue, int importancy) : base(rootRulePart, name, directValue, importancy)
         {
             ReverseValue = reverseValue;
         }

@@ -49,18 +49,20 @@ namespace ProductionSystem
 
             IRulePart rootRulePart = jsonRulePart.GetRulePart();
 
+            int importancy = jsonRule.GetInt("i");
+
             try
             {
                 jsonReverseValue = jsonRule.GetElement("r");
             }
             catch
             {
-                return new Rule(rootRulePart, name, directValue);
+                return new Rule(rootRulePart, name, directValue, importancy);
             }
 
             string reverseValue = jsonReverseValue.ExtractString("r");
 
-            return new TwoHeadedRule(rootRulePart, name, directValue, reverseValue);
+            return new TwoHeadedRule(rootRulePart, name, directValue, reverseValue, importancy);
         }
 
         private static JsonElement GetElement(this JsonElement jsonElement, string propertyName)
@@ -83,6 +85,28 @@ namespace ProductionSystem
                 throw new WrongFormatException("\"" + propertyName + "\" expected to be string, got " + childElement.ValueKind);
 
             return childElement.ExtractString(propertyName);
+        }
+
+        private static int GetInt(this JsonElement jsonElement, string propertyName)
+        {
+            JsonElement childElement = GetElement(jsonElement, propertyName);
+
+            if (childElement.ValueKind != JsonValueKind.Number)
+                throw new WrongFormatException("\"" + propertyName + "\" expected to be a number, got " + childElement.ValueKind);
+
+            return childElement.ExtractInt(propertyName);
+        }
+
+        private static int ExtractInt(this JsonElement jsonInt, string propertyName)
+        {
+            try
+            {
+                return jsonInt.GetInt32();
+            }
+            catch
+            {
+                throw new WrongFormatException("Failed to represent \"" + propertyName + "\" as an integer.");
+            }
         }
 
         private static string ExtractString(this JsonElement jsonString, string propertyName)

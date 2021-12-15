@@ -11,14 +11,16 @@
     {
         public readonly string Name;
         public readonly string DirectValue;
+        public readonly int Importancy;
 
         protected IRulePart _rootRulePart;
 
-        public Rule(IRulePart rootRulePart, string name, string directValue)
+        public Rule(IRulePart rootRulePart, string name, string directValue, int importancy)
         {
             _rootRulePart = rootRulePart;
             Name = name;
             DirectValue = directValue;
+            Importancy = importancy;
         }
 
         public virtual RuleState GetRuleState(IFactsProvider factsProvider)
