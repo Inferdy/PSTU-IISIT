@@ -173,11 +173,10 @@
         <Name>KnowledgeBase</Name>
         <Access>Public</Access>
         <Location left="1433" top="462" />
-        <Size width="178" height="128" />
+        <Size width="173" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Storage storage</Member>
         <Member type="Constructor">public KnowledgeBase(Rule[] rules)</Member>
-        <Member type="Method">public Enumerator GetEnumerator()</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
@@ -194,7 +193,7 @@
       <Entity type="Class">
         <Name>Enumerator</Name>
         <Access>Public</Access>
-        <Location left="824" top="445" />
+        <Location left="1151" top="582" />
         <Size width="175" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Storage storage</Member>
@@ -223,7 +222,7 @@
         <Name>ProductionSystem</Name>
         <Access>Public</Access>
         <Location left="845" top="285" />
-        <Size width="162" height="216" />
+        <Size width="346" height="162" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IKnowledgeBase knowledgeBase</Member>
         <Member type="Field">private IInferenceEngine inferenceEngine</Member>
@@ -285,6 +284,10 @@
       <Relationship type="Realization" first="22" second="14">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Nesting" first="17" second="19">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
       </Relationship>
     </Relationships>
   </ProjectItem>
