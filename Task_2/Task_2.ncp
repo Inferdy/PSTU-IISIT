@@ -7,7 +7,7 @@
       <Entity type="Class">
         <Name>FixedFact</Name>
         <Access>Public</Access>
-        <Location left="163" top="139" />
+        <Location left="48" top="385" />
         <Size width="163" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">public readonly string Name</Member>
@@ -17,24 +17,25 @@
       <Entity type="Interface">
         <Name>IFactsProvider</Name>
         <Access>Public</Access>
-        <Location left="533" top="179" />
-        <Size width="197" height="78" />
+        <Location left="1736" top="117" />
+        <Size width="364" height="78" />
         <Collapsed>False</Collapsed>
         <Member type="Method">FixedFact? GetFact(string name)</Member>
       </Entity>
       <Entity type="Interface">
         <Name>IWorkingMemory</Name>
         <Access>Public</Access>
-        <Location left="373" top="319" />
-        <Size width="178" height="95" />
+        <Location left="1533" top="279" />
+        <Size width="364" height="112" />
         <Collapsed>False</Collapsed>
         <Member type="Method">void AddFact(FixedFact fact)</Member>
         <Member type="Method">void Reset()</Member>
+        <Member type="Method">Tuple&lt;string, IEnumerable&lt;FixedFact&gt;&gt; Explain(string factName)</Member>
       </Entity>
       <Entity type="Interface">
         <Name>IKnowledgeBase</Name>
         <Access>Public</Access>
-        <Location left="1306" top="271" />
+        <Location left="737" top="274" />
         <Size width="286" height="95" />
         <Collapsed>False</Collapsed>
         <Member type="Method">ILockEnumerator&lt;Rule&gt; GetUnlockedEnumerator()</Member>
@@ -43,8 +44,8 @@
       <Entity type="Class">
         <Name>Rule</Name>
         <Access>Public</Access>
-        <Location left="66" top="592" />
-        <Size width="522" height="230" />
+        <Location left="48" top="693" />
+        <Size width="522" height="247" />
         <Collapsed>False</Collapsed>
         <Member type="Field">public readonly string RuleName</Member>
         <Member type="Field">public readonly string FactName</Member>
@@ -55,12 +56,13 @@
         <Member type="Method">public bool? GetBoolValue(IFactsProvider factsProvider)</Member>
         <Member type="Method">public bool IsActive(bool boolValue)</Member>
         <Member type="Method">public FixedFact GetFact(bool boolValue)</Member>
+        <Member type="Method">public Tuple&lt;string, IEnumerable&lt;FixedFact&gt;&gt; Explain(string factValue)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>TwoHeadedRule</Name>
         <Access>Public</Access>
-        <Location left="709" top="535" />
+        <Location left="22" top="1052" />
         <Size width="683" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private string reverseValue</Member>
@@ -70,23 +72,24 @@
       <Entity type="Interface">
         <Name>IRulePart</Name>
         <Access>Public</Access>
-        <Location left="954" top="643" />
-        <Size width="256" height="78" />
+        <Location left="1260" top="768" />
+        <Size width="256" height="95" />
         <Collapsed>False</Collapsed>
         <Member type="Method">bool? GetValue(IFactsProvider factsProvider)</Member>
+        <Member type="Method">Tuple&lt;string, IEnumerable&lt;FixedFact&gt;&gt; Explain(bool boolValue)</Member>
       </Entity>
       <Entity type="Interface">
         <Name>ILockEnumerator&lt;T&gt;</Name>
         <Access>Public</Access>
-        <Location left="1077" top="247" />
-        <Size width="163" height="78" />
+        <Location left="737" top="589" />
+        <Size width="175" height="78" />
         <Collapsed>False</Collapsed>
         <Member type="Method">void LockCurrent()</Member>
       </Entity>
       <Entity type="Class">
         <Name>AndRulePart</Name>
         <Access>Public</Access>
-        <Location left="748" top="785" />
+        <Location left="1677" top="961" />
         <Size width="200" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IRulePart[] ruleParts</Member>
@@ -96,7 +99,7 @@
       <Entity type="Class">
         <Name>OrRulePart</Name>
         <Access>Public</Access>
-        <Location left="954" top="797" />
+        <Location left="976" top="961" />
         <Size width="193" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IRulePart[] ruleParts</Member>
@@ -106,7 +109,7 @@
       <Entity type="Class">
         <Name>NotRulePart</Name>
         <Access>Public</Access>
-        <Location left="1151" top="785" />
+        <Location left="1188" top="961" />
         <Size width="185" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IRulePart rulePart</Member>
@@ -116,7 +119,7 @@
       <Entity type="Class">
         <Name>FactRulePart</Name>
         <Access>Public</Access>
-        <Location left="1346" top="797" />
+        <Location left="1395" top="961" />
         <Size width="265" height="128" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private string name</Member>
@@ -127,8 +130,8 @@
       <Entity type="Interface">
         <Name>IInferenceEngine</Name>
         <Access>Public</Access>
-        <Location left="1144" top="51" />
-        <Size width="291" height="95" />
+        <Location left="1088" top="279" />
+        <Size width="374" height="95" />
         <Collapsed>False</Collapsed>
         <Member type="Method">void Sort(ILockEnumerator&lt;Rule&gt; lockEnumerator)</Member>
         <Member type="Method">FixedFact? Infer()</Member>
@@ -136,15 +139,15 @@
       <Entity type="Interface">
         <Name>IFactsReceiver</Name>
         <Access>Public</Access>
-        <Location left="748" top="319" />
-        <Size width="291" height="78" />
+        <Location left="1956" top="279" />
+        <Size width="364" height="78" />
         <Collapsed>False</Collapsed>
         <Member type="Method">FixedFact? GetNewFact(IFactsProvider currentBase)</Member>
       </Entity>
       <Entity type="Interface">
         <Name>IProductionSystem</Name>
         <Access>Public</Access>
-        <Location left="689" top="79" />
+        <Location left="302" top="279" />
         <Size width="364" height="112" />
         <Collapsed>False</Collapsed>
         <Member type="Method">Tuple&lt;string, IEnumerable&lt;FixedFact&gt;&gt; Explain(string factName)</Member>
@@ -154,7 +157,7 @@
       <Entity type="Delegate">
         <Name>FactFixedEventHandler</Name>
         <Access>Public</Access>
-        <Location left="444" top="28" />
+        <Location left="48" top="279" />
         <Size width="163" height="78" />
         <Collapsed>False</Collapsed>
         <ReturnType>void</ReturnType>
@@ -163,7 +166,7 @@
       <Entity type="Class">
         <Name>JsonRuleReader</Name>
         <Access>Public</Access>
-        <Location left="66" top="297" />
+        <Location left="48" top="529" />
         <Size width="184" height="94" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public static List&lt;Rule&gt; Parse(string path)</Member>
@@ -172,8 +175,8 @@
       <Entity type="Class">
         <Name>KnowledgeBase</Name>
         <Access>Public</Access>
-        <Location left="1433" top="462" />
-        <Size width="173" height="111" />
+        <Location left="737" top="444" />
+        <Size width="286" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Storage storage</Member>
         <Member type="Constructor">public KnowledgeBase(Rule[] rules)</Member>
@@ -182,8 +185,8 @@
       <Entity type="Class">
         <Name>Storage</Name>
         <Access>Public</Access>
-        <Location left="1094" top="445" />
-        <Size width="163" height="128" />
+        <Location left="737" top="866" />
+        <Size width="175" height="128" />
         <Collapsed>False</Collapsed>
         <Member type="Field">public Rule[] rules</Member>
         <Member type="Field">public int validLimiter</Member>
@@ -193,7 +196,7 @@
       <Entity type="Class">
         <Name>Enumerator</Name>
         <Access>Public</Access>
-        <Location left="1151" top="582" />
+        <Location left="737" top="723" />
         <Size width="175" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private Storage storage</Member>
@@ -203,8 +206,8 @@
       <Entity type="Class">
         <Name>WorkingMemory</Name>
         <Access>Public</Access>
-        <Location left="401" top="484" />
-        <Size width="267" height="94" />
+        <Location left="1533" top="444" />
+        <Size width="364" height="94" />
         <Collapsed>False</Collapsed>
         <Member type="Field">List&lt;FixedFact&gt; storage = new List&lt;FixedFact&gt;</Member>
         <Modifier>None</Modifier>
@@ -212,7 +215,7 @@
       <Entity type="Class">
         <Name>InferenceEngine</Name>
         <Access>Public</Access>
-        <Location left="1456" top="121" />
+        <Location left="1088" top="444" />
         <Size width="374" height="94" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;Tuple&lt;Rule, bool&gt;&gt; activeRules = new List&lt;Tuple&lt;Rule bool&gt;&gt;</Member>
@@ -221,8 +224,8 @@
       <Entity type="Class">
         <Name>ProductionSystem</Name>
         <Access>Public</Access>
-        <Location left="845" top="285" />
-        <Size width="346" height="162" />
+        <Location left="302" top="444" />
+        <Size width="364" height="162" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private IKnowledgeBase knowledgeBase</Member>
         <Member type="Field">private IInferenceEngine inferenceEngine</Member>
@@ -238,8 +241,8 @@
         <EndOrientation>Vertical</EndOrientation>
       </Relationship>
       <Relationship type="Generalization" first="5" second="4">
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
       </Relationship>
       <Relationship type="Realization" first="8" second="6">
         <StartOrientation>Vertical</StartOrientation>
@@ -252,6 +255,10 @@
       <Relationship type="Realization" first="10" second="6">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>1389</X>
+          <Y>889</Y>
+        </BendPoint>
       </Relationship>
       <Relationship type="Realization" first="11" second="6">
         <StartOrientation>Vertical</StartOrientation>
