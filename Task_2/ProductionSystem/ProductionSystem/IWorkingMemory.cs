@@ -2,7 +2,9 @@ namespace ProductionSystem
 {
 	public interface IWorkingMemory : IFactsProvider
 	{
-		void AddFact(FixedFact fact);
+		bool AddFact(FixedFact fact);
+
+		Tuple<FixedFact, Rule?>? GetFactAndRule(string factName);
 
 		void Reset();
 	}
