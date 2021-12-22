@@ -5,27 +5,51 @@ namespace ProductionSystem
 		public readonly string RuleName;
 		public readonly string FactName;
 		public readonly int Importance;
-		private string directValue;
+		protected string directValue;
 		private IRulePart rootRulePart;
 
-		public Rule(string ruleName, string factName, int importance, string directValue, IRulePart rootRulePart)
+		public Rule(
+			string ruleName,
+			string factName,
+			int importance,
+			string directValue,
+			IRulePart rootRulePart)
 		{
-			throw new System.NotImplementedException();
+			RuleName = ruleName;
+			FactName = factName;
+			Importance = importance;
+			this.directValue = directValue;
+			this.rootRulePart = rootRulePart;
 		}
 
 		public bool? GetBoolValue(IFactsProvider factsProvider)
 		{
-			throw new System.NotImplementedException();
+			return rootRulePart.GetValue(factsProvider);
 		}
 
-		public bool IsActive(bool boolValue)
+		public virtual bool IsActive(bool boolValue)
 		{
-			throw new System.NotImplementedException();
+			return boolValue = true;
 		}
 
-		public FixedFact GetFact(bool boolValue)
+		public virtual string GetFactValue(bool boolValue)
+        {
+			if (boolValue)
+				return directValue;
+
+			throw new UnexpectedContradictionException();
+        }
+
+		public virtual FixedFact GetFact(bool boolValue)
 		{
-			throw new System.NotImplementedException();
+			return new FixedFact(FactName, GetFactValue(boolValue));
 		}
+
+		public ExclusiveList<FixedFact>? Explain(IFactsProvider factsProvider)
+        {
+            Tuple<ExclusiveList<FixedFact>?, bool?> tuple = rootRulePart.Explain(factsProvider);
+
+			return tuple.Item1;
+        }
 	}
 }
