@@ -145,25 +145,39 @@ namespace ProductionSystem
             switch (partType)
             {
                 case "f":
-                    string name = jsonRulePart.GetString("n");
-                    string value = jsonRulePart.GetString("v");
+                    {
+                        string name = jsonRulePart.GetString("n");
+                        string value = jsonRulePart.GetString("v");
 
-                    return new FactRulePart(name, value);
+                        return new FactRulePart(name, value);
+                    }
                 case "o":
-                    IRulePart[] orParts = jsonRulePart.GetObjects("c").GetRuleParts();
+                    {
+                        IRulePart[] orParts = jsonRulePart.GetObjects("c").GetRuleParts();
 
-                    return new OrRulePart(orParts);
+                        return new OrRulePart(orParts);
+                    }
                 case "a":
-                    IRulePart[] andParts = jsonRulePart.GetObjects("c").GetRuleParts();
+                    {
+                        IRulePart[] andParts = jsonRulePart.GetObjects("c").GetRuleParts();
 
-                    return new AndRulePart(andParts);
+                        return new AndRulePart(andParts);
+                    }
                 case "n":
-                    JsonElement condition = jsonRulePart.GetElement("c");
-                    IRulePart notPart = condition.GetRulePart();
+                    {
+                        JsonElement condition = jsonRulePart.GetElement("c");
+                        IRulePart notPart = condition.GetRulePart();
 
-                    return new NotRulePart(notPart);
+                        return new NotRulePart(notPart);
+                    }
                 case "t":
                     return new TrueRulePart();
+                case "e":
+                    {
+                        string name = jsonRulePart.GetString("n");
+
+                        return new FactExistsRulePart(name);
+                    }
                 default:
                     throw new WrongFormatException("Got unexpected rule type: " + partType);
             }
