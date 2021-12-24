@@ -1,44 +1,81 @@
+using System.Collections;
+
 namespace ProductionSystem
 {
     public class WorkingMemory : IWorkingMemory
     {
-        private Dictionary<FixedFact, Rule> storage = new Dictionary<FixedFact, Rule>();
-
-        public bool AddFact(FixedFact fact)
-        {
-            foreach (KeyValuePair<FixedFact, Rule> pair in storage)
-                if (pair.Key.Name == fact.Name)
-                {
-                    if (pair.Key.Value == fact.Value)
-                        return true;
-                    else
-                        throw new UnexpectedContradictionException();
-                }
-
-            return false;
-        }
+        private Storage storage = new Storage();
 
         public FixedFact? GetFact(string name)
         {
-            foreach (KeyValuePair<FixedFact, Rule> pair in storage)
-                if (pair.Key.Name == name)
-                    return pair.Key;
-
-            return null;
-        }
-
-        public Tuple<FixedFact, Rule?>? GetFactAndRule(string factName)
-        {
-            foreach (KeyValuePair<FixedFact, Rule> pair in storage)
-                if (pair.Key.Name == factName)
-                    return new Tuple<FixedFact, Rule?>(pair.Key, pair.Value);
-
-            return null;
+            return storage.Get(name);
         }
 
         public void Reset()
         {
             storage.Clear();
+        }
+
+        public void SetFact(FixedFact fact)
+        {
+            storage.Add(fact);
+        }
+
+        private class Storage
+        {
+            private class Node
+            {
+                public FixedFact Value;
+                public Node? Next;
+
+                public Node(FixedFact value, Node? next)
+                {
+                    Value = value;
+                    Next = next;
+                }
+            }
+
+            private Node? head = null;
+
+            public void Add(FixedFact fact)
+            {
+                if (head == null)
+                {
+                    head = new Node(fact, null);
+                    return;
+                }
+
+                for (Node? current = head; ;)
+                {
+                    if (current.Value.Name == fact.Name)
+                    {
+                        current.Value = fact;
+                        return;
+                    }
+
+                    if (current.Next == null)
+                    {
+                        current.Next = new Node(fact, null);
+                        return;
+                    }
+
+                    current = current.Next;
+                }
+            }
+
+            public FixedFact? Get(string name)
+            {
+                for (Node? current = head; current != null; current = current.Next)
+                    if (current.Value.Name == name)
+                        return current.Value;
+
+                return null;
+            }
+
+            public void Clear()
+            {
+                head = null;
+            }
         }
     }
 }

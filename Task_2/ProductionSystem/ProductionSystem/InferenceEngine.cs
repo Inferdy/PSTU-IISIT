@@ -1,96 +1,47 @@
 namespace ProductionSystem
 {
-	public class InferenceEngine : IInferenceEngine
-	{
-		private class SortedList
+    internal class InferenceEngine : IInferenceEngine
+    {
+        private ILocker<IRule>? locker = null;
+
+        public FixedFact? Infer(IPrinter printer, IAsker asker)
         {
-            private class Node
-            {
-                public Rule Rule;
-                public bool Value;
-                public Node? Next;
+            FixedFact? fact = locker.Value.Activate(printer, asker);
 
-                public Node(Rule rule, bool value, Node? next)
-                {
-                    Rule = rule;
-                    Value = value;
-                    Next = next;
-                }
-            }
+            locker.Lock();
+            locker = null;
 
-            private Node? head = null;
-
-            public void Add(Rule rule, bool value)
-            {
-                if (head == null)
-                {
-                    head = new Node(rule, value, null);
-                }
-
-                int importance = rule.Importance;
-                if (importance >= head.Rule.Importance)
-                    head = new Node(rule, value, head);
-
-                Node current = head;
-                Node? next = current.Next;
-
-                while (next != null)
-                {
-                    if (next.Rule.Importance <= importance)
-                        break;
-
-                    current = next;
-                    next = next.Next;
-                }
-
-                current.Next = new Node(rule, value, next);
-            }
-
-            public Tuple<Rule, bool>? PopFirst()
-            {
-                if (head == null)
-                    return null;
-
-                Rule rule = head.Rule;
-                bool value = head.Value;
-
-                head = head.Next;
-
-                return new Tuple<Rule, bool>(rule, value);
-            }
+            return fact;
         }
 
-        private SortedList storage = new SortedList();
-
-        public FixedFact? Infer()
+        public bool IsActive()
         {
-            Tuple<Rule, bool>? tuple = storage.PopFirst();
-
-            if (tuple == null)
-                return null;
-
-            return tuple.Item1.GetFact(tuple.Item2);
+            return locker != null;
         }
 
-        public void Sort(ILockEnumerator<Rule> lockEnumerator, IFactsProvider factsProvider)
+        public bool Sort(IEnumerator<ILocker<IRule>> enumerator, IFactsProvider factsProvider)
         {
-            Rule current;
-            bool? boolValue;
+            bool result = false;
 
-            while(lockEnumerator.MoveNext())
+            IRule currentRule;
+
+            while (enumerator.MoveNext())
             {
-                current = lockEnumerator.Current;
+                currentRule = enumerator.Current.Value;
 
-                boolValue = current.GetBoolValue(factsProvider);
+                if (currentRule.IsActive(factsProvider))
+                {
+                    result = true;
 
-                if (boolValue == null)
-                    break;
+                    if (locker == null)
+                        locker = enumerator.Current;
+                    else
+                    if (currentRule.Importance > locker.Value.Importance)
+                        locker = enumerator.Current;
+                }
+            }
 
-                if (current.IsActive((bool)boolValue))
-                    storage.Add(current, (bool)boolValue);
-
-                lockEnumerator.LockCurrent();
-            }    
+            return result;
         }
     }
 }

@@ -1,9 +1,11 @@
 namespace ProductionSystem
 {
-	public interface IInferenceEngine
+	internal interface IInferenceEngine
 	{
-		void Sort(ILockEnumerator<Rule> lockEnumerator, IFactsProvider factsProvider);
+		bool Sort(IEnumerator<ILocker<IRule>> enumerator, IFactsProvider factsProvider);
 
-		FixedFact? Infer();
+		bool IsActive();
+
+		FixedFact? Infer(IPrinter printer, IAsker asker);
 	}
 }

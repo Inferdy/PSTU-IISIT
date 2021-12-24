@@ -2,10 +2,10 @@ using System.Text.Json;
 
 namespace ProductionSystem
 {
-	public static class JsonRuleReader
-	{
-		public static Rule[] Parse(string path)
-		{
+    internal static class JsonRuleReader
+    {
+        public static IRule[] Parse(string path)
+        {
             string text = File.ReadAllText(path);
 
             JsonDocument jsonDocument;
@@ -26,7 +26,7 @@ namespace ProductionSystem
 
             int length = jsonArray.GetArrayLength();
 
-            Rule[] rules = new Rule[length];
+            IRule[] rules = new IRule[length];
 
             for (int i = 0; i < length; i++)
                 rules[i] = jsonArray[i].GetRule();
@@ -34,37 +34,51 @@ namespace ProductionSystem
             return rules;
         }
 
-        private static Rule GetRule(this JsonElement jsonRule)
+        private static IRule GetRule(this JsonElement jsonRule)
         {
             if (jsonRule.ValueKind != JsonValueKind.Object)
                 throw new WrongFormatException("Rule element expected to be an object, got " + jsonRule.ValueKind);
 
             string ruleName = jsonRule.GetString("rn");
 
-            string factName = jsonRule.GetString("fn");
-
             int importance = jsonRule.GetInt("i");
 
-            string directValue = jsonRule.GetString("d");
+            string ruleType = jsonRule.GetString("t");
 
-            JsonElement jsonReverseValue;
-
-            JsonElement jsonRulePart = jsonRule.GetElement("c");
-
-            IRulePart rootRulePart = jsonRulePart.GetRulePart();
-
-            try
+            switch (ruleType)
             {
-                jsonReverseValue = jsonRule.GetElement("r");
-            }
-            catch
-            {
-                return new Rule(ruleName, factName, importance, directValue, rootRulePart);
-            }
+                case "c":
+                    {
+                        string factName = jsonRule.GetString("fn");
+                        string factValue = jsonRule.GetString("v");
 
-            string reverseValue = jsonReverseValue.ExtractString("r");
+                        JsonElement condition = jsonRule.GetElement("c");
+                        IRulePart rootRulePart = condition.GetRulePart();
 
-            return new TwoHeadedRule(ruleName, factName, importance, directValue, reverseValue, rootRulePart);
+                        return new Rule(ruleName, importance, factName, factValue, rootRulePart);
+                    }
+                case "q":
+                    {
+                        string factName = jsonRule.GetString("fn");
+                        string question = jsonRule.GetString("q");
+
+                        JsonElement condition = jsonRule.GetElement("c");
+                        IRulePart rootRulePart = condition.GetRulePart();
+
+                        return new QuestionRule(ruleName, importance, factName, question, rootRulePart);
+                    }
+                case "p":
+                    {
+                        string text = jsonRule.GetString("p");
+
+                        JsonElement condition = jsonRule.GetElement("c");
+                        IRulePart rootRulePart = condition.GetRulePart();
+
+                        return new PrintRule(ruleName, importance, text, rootRulePart);
+                    }
+                default:
+                    throw new WrongFormatException("Unexpected rule type, got: " + ruleType);
+            }
         }
 
         private static JsonElement GetElement(this JsonElement jsonElement, string propertyName)

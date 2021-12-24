@@ -1,65 +1,39 @@
 namespace ProductionSystem
 {
-	public class ProductionSystem : IProductionSystem
-	{
-		private IKnowledgeBase knowledgeBase;
-		private IInferenceEngine inferenceEngine;
-		IFactsReceiver factsReceiver;
-		IWorkingMemory workingMemory;
+    public class ProductionSystem : IProductionSystem
+    {
+        private IKnowledgeBase kb;
 
-		public ProductionSystem(string wmPath, IFactsReceiver factsReceiver)
-		{
-            Rule[] rules = JsonRuleReader.Parse(wmPath).ToArray();
+        private IWorkingMemory wm;
 
-            knowledgeBase = new KnowledgeBase(rules);
+        private IInferenceEngine engine;
 
-            inferenceEngine = new InferenceEngine();
-
-            this.factsReceiver = factsReceiver;
-
-            workingMemory = new WorkingMemory();
-		}
-
-        public event FactFixedEventHandler? OnFactFixed;
-
-        public Tuple<string, IEnumerable<FixedFact>?>? Explain(string factName)
+        public ProductionSystem(string pathKB)
         {
-            Tuple<FixedFact, Rule?>? tuple = workingMemory.GetFactAndRule(factName);
+            IRule[] rules = JsonRuleReader.Parse(pathKB);
 
-            if (tuple == null || tuple.Item2 == null)
-                return null;
+            kb = new KnowledgeBase(rules);
 
-            string ruleName = tuple.Item2.RuleName;
+            wm = new WorkingMemory();
 
-            ExclusiveList<FixedFact>? facts = tuple.Item2.Explain(workingMemory);
-
-            return new Tuple<string, IEnumerable<FixedFact>?>(ruleName, facts);
+            engine = new InferenceEngine();
         }
 
-        public void Run(List<string> importantFacts)
+        public void Run(IPrinter printer, IAsker asker)
         {
-            for(FixedFact? newFact = factsReceiver.GetNewFact(workingMemory);
-                newFact != null;
-                newFact = factsReceiver.GetNewFact(workingMemory))
-                do
-                {
-                    //Добавляем факт в рабочую память
-                    workingMemory.AddFact(newFact);
+            FixedFact? fact;
 
-                    //Событие при добавлении нового факта в рабочую память
-                    OnFactFixed?.Invoke(newFact);
+            IEnumerator<ILocker<IRule>> enumerator = kb.GetEnumerator();
 
-                    //Перечислитель назблокированных правил
-                    ILockEnumerator<Rule> enumerator = knowledgeBase.GetUnlockedEnumerator();
+            while (engine.Sort(enumerator, wm))
+            {
+                fact = engine.Infer(printer, asker);
 
-                    //Добавление в МЛВ активных правил и блокировка недействительных
-                    inferenceEngine.Sort(enumerator, workingMemory);
+                if (fact != null)
+                    wm.SetFact(fact);
 
-                    //Выводим новый факт с помощью МЛВ
-                    newFact = inferenceEngine.Infer();
-                }
-                //Пока не закончатся активные правила в МЛВ
-                while (newFact != null);
+                enumerator = kb.GetEnumerator();
+            }
         }
     }
 }
