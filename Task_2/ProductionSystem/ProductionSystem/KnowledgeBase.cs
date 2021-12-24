@@ -2,42 +2,103 @@ using System.Collections;
 
 namespace ProductionSystem
 {
-	public class KnowledgeBase : IKnowledgeBase
-	{
-		public class Storage
-		{
-			public Rule[] rules;
-			public int validLimiter;
+    internal class KnowledgeBase : IKnowledgeBase
+    {
+        private Storage storage;
 
-			public Storage(Rule[] rules)
-			{
-				this.rules = rules;
-                validLimiter = rules.Length;
-			}
-		}
+        public KnowledgeBase(IRule[] rules)
+        {
+            storage = new Storage(rules);
+        }
 
-		public class Enumerator : ILockEnumerator<Rule>
-		{
-			private Storage storage;
-            private int i = -1;
+        public IEnumerator<ILocker<IRule>> GetEnumerator()
+        {
+            return new Enumerator(storage);
+        }
 
-			public Enumerator(Storage storage)
-			{
-				this.storage = storage;
-			}
+        public void Reset()
+        {
+            storage.Reset();
+        }
 
-            public Rule Current
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        private class Storage
+        {
+            private IRule[] rules;
+            public int ValidLimiter { get; private set; }
+
+            public Storage(IRule[] rules)
+            {
+                this.rules = rules;
+                ValidLimiter = this.rules.Length;
+            }
+
+            public IRule this[int i]
             {
                 get
                 {
-                    try
-                    {
-                        return storage.rules[i];
-                    }
-                    catch
-                    {
+                    return rules[i];
+                }
+            }
+
+            public void Reset()
+            {
+                ValidLimiter = rules.Length;
+            }
+
+            public void Lock(int i)
+            {
+                ValidLimiter--;
+
+                IRule tmp = rules[i];
+                rules[i] = rules[ValidLimiter];
+                rules[ValidLimiter] = tmp;
+            }
+        }
+
+        private class Locker : ILocker<IRule>
+        {
+            public IRule Value { get; }
+            private int i;
+            private Storage storage;
+            private bool ready = true;
+
+            public Locker(IRule value, int i, Storage storage)
+            {
+                Value = value;
+                this.i = i;
+                this.storage = storage;
+            }
+
+            public void Lock()
+            {
+                storage.Lock(i);
+            }
+        }
+
+        private class Enumerator : IEnumerator<ILocker<IRule>>
+        {
+            private int i = -1;
+            private Storage storage;
+            private ILocker<IRule>? locker = null;
+
+            public Enumerator(Storage storage)
+            {
+                this.storage = storage;
+            }
+
+            public ILocker<IRule> Current
+            {
+                get
+                {
+                    if (locker == null)
                         throw new InvalidOperationException();
-                    }
+
+                    return locker;
                 }
             }
 
@@ -48,48 +109,24 @@ namespace ProductionSystem
                 //Empty
             }
 
-            public void LockCurrent()
-            {
-                storage.validLimiter--;
-
-                Rule[] rules = storage.rules;
-                int limiter = storage.validLimiter;
-
-                Rule tmp = rules[i];
-                rules[i] = rules[limiter];
-                rules[limiter] = tmp;
-
-                i--;
-            }
-
             public bool MoveNext()
             {
                 i++;
 
-                return i < storage.validLimiter;
+                if (i < storage.ValidLimiter)
+                {
+                    locker = new Locker(storage[i], i, storage);
+                    return true;
+                }
+
+                locker = null;
+                return false;
             }
 
             public void Reset()
             {
                 i = -1;
             }
-        }
-
-        private Storage storage;
-
-		public KnowledgeBase(Rule[] rules)
-		{
-            storage = new Storage(rules);
-		}
-
-        public ILockEnumerator<Rule> GetUnlockedEnumerator()
-        {
-            return new Enumerator(storage);
-        }
-
-        public void Reset()
-        {
-			storage.validLimiter = storage.rules.Length;
         }
     }
 }

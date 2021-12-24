@@ -1,83 +1,57 @@
 namespace ProductionSystem
 {
-	public class OrRulePart : IRulePart
-	{
-		private IRulePart[] ruleParts;
+    public class OrRulePart : IRulePart
+    {
+        private IRulePart[] ruleParts;
 
-		public OrRulePart(IRulePart[] ruleParts)
-		{
-			this.ruleParts = ruleParts;
-		}
-
-        public Tuple<ExclusiveList<FixedFact>?, bool?> Explain(IFactsProvider factsProvider)
+        public OrRulePart(IRulePart[] ruleParts)
         {
-            bool defined = true;
-            bool ok = true;
+            this.ruleParts = ruleParts;
+        }
+
+        public Tuple<ExclusiveList<FixedFact>?, bool> Explain(IFactsProvider factsProvider)
+        {
+            bool failed = true;
 
             ExclusiveList<FixedFact> list = new ExclusiveList<FixedFact>();
 
-            Tuple<ExclusiveList<FixedFact>?, bool?> value;
+            Tuple<ExclusiveList<FixedFact>?, bool> tuple;
 
             foreach (IRulePart rulePart in ruleParts)
             {
-                value = rulePart.Explain(factsProvider);
+                tuple = rulePart.Explain(factsProvider);
 
-                switch (value.Item2)
+                if (tuple.Item2)
                 {
-                    case true:
-                        if (ok)
-                        {
-                            ok = false;
+                    if (failed)
+                    {
+                        failed = false;
 
-                            list.Clear();
-                        }
+                        list.Clear();
+                    }
 
-                        list.Merge(value.Item1);
-                        break;
-                    case null:
-                        if (ok && defined)
-                            list.Clear();
-
-                        defined = false;
-                        break;
-                    case false:
-                        if (ok && defined)
-                            list.Merge(value.Item1);
-                        break;
+                    list.Merge(tuple.Item1);
+                    break;
+                }
+                else
+                {
+                    if (failed)
+                    {
+                        list.Merge(tuple.Item1);
+                    }
                 }
             }
 
-            if (ok)
-            {
-                if (defined)
-                    return new Tuple<ExclusiveList<FixedFact>?, bool?>(list, false);
-                else
-                    return new Tuple<ExclusiveList<FixedFact>?, bool?>(null, null);
-            }
-            else
-                return new Tuple<ExclusiveList<FixedFact>?, bool?>(list, true);
+            return new Tuple<ExclusiveList<FixedFact>?, bool>(list, !failed);
         }
 
-        public bool? GetValue(IFactsProvider factsProvider)
+        public bool GetValue(IFactsProvider factsProvider)
         {
-            bool defined = true;
-
             foreach (IRulePart rulePart in ruleParts)
-                switch (rulePart.GetValue(factsProvider))
-                {
-                    case true:
-                        return true;
-                    case null:
-                        defined = false;
-                        break;
-                    case false:
-                        break;
-                }
+                if (rulePart.GetValue(factsProvider))
+                    return true;
 
-            if (defined)
-                return false;
-
-            return null;
+            return false;
         }
     }
 }
