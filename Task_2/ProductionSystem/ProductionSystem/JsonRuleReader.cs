@@ -162,6 +162,8 @@ namespace ProductionSystem
                     IRulePart notPart = condition.GetRulePart();
 
                     return new NotRulePart(notPart);
+                case "t":
+                    return new TrueRulePart();
                 default:
                     throw new WrongFormatException("Got unexpected rule type: " + partType);
             }
