@@ -11,7 +11,7 @@ namespace ProductionSystem
             storage = new Storage(rules);
         }
 
-        public IEnumerator<ILocker<IRule>> GetEnumerator()
+        public ILockEnumerator<IRule> GetEnumerator()
         {
             return new Enumerator(storage);
         }
@@ -19,11 +19,6 @@ namespace ProductionSystem
         public void Reset()
         {
             storage.Reset();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
 
         private class Storage
@@ -65,7 +60,6 @@ namespace ProductionSystem
             public IRule Value { get; }
             private int i;
             private Storage storage;
-            private bool ready = true;
 
             public Locker(IRule value, int i, Storage storage)
             {
@@ -80,25 +74,25 @@ namespace ProductionSystem
             }
         }
 
-        private class Enumerator : IEnumerator<ILocker<IRule>>
+        private class Enumerator : ILockEnumerator<IRule>
         {
             private int i = -1;
             private Storage storage;
-            private ILocker<IRule>? locker = null;
+            private IRule? current = null;
 
             public Enumerator(Storage storage)
             {
                 this.storage = storage;
             }
 
-            public ILocker<IRule> Current
+            public IRule Current
             {
                 get
                 {
-                    if (locker == null)
+                    if (current == null)
                         throw new InvalidOperationException();
 
-                    return locker;
+                    return current;
                 }
             }
 
@@ -109,17 +103,22 @@ namespace ProductionSystem
                 //Empty
             }
 
+            public ILocker<IRule> GetLocker()
+            {
+                return new Locker(Current, i, storage);
+            }
+
             public bool MoveNext()
             {
                 i++;
 
                 if (i < storage.ValidLimiter)
                 {
-                    locker = new Locker(storage[i], i, storage);
+                    current = storage[i];
                     return true;
                 }
 
-                locker = null;
+                current = null;
                 return false;
             }
 

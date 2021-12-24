@@ -1,7 +1,9 @@
 namespace ProductionSystem
 {
-    internal interface IKnowledgeBase : IEnumerable<ILocker<IRule>>
+    internal interface IKnowledgeBase
     {
+        ILockEnumerator<IRule> GetEnumerator();
+
         void Reset();
     }
 }

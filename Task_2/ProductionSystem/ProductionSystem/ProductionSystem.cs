@@ -26,7 +26,7 @@ namespace ProductionSystem
 
             FixedFact? fact;
 
-            IEnumerator<ILocker<IRule>> enumerator = kb.GetEnumerator();
+            ILockEnumerator<IRule> enumerator = kb.GetEnumerator();
 
             while (engine.Sort(enumerator, wm))
             {

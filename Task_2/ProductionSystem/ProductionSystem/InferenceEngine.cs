@@ -19,29 +19,21 @@ namespace ProductionSystem
             return locker != null;
         }
 
-        public bool Sort(IEnumerator<ILocker<IRule>> enumerator, IFactsProvider factsProvider)
+        public bool Sort(ILockEnumerator<IRule> enumerator, IFactsProvider factsProvider)
         {
-            bool result = false;
-
-            IRule currentRule;
+            locker = null;
 
             while (enumerator.MoveNext())
-            {
-                currentRule = enumerator.Current.Value;
-
-                if (currentRule.IsActive(factsProvider))
+                if (enumerator.Current.IsActive(factsProvider))
                 {
-                    result = true;
-
                     if (locker == null)
-                        locker = enumerator.Current;
+                        locker = enumerator.GetLocker();
                     else
-                    if (currentRule.Importance > locker.Value.Importance)
-                        locker = enumerator.Current;
+                    if (enumerator.Current.Importance > locker.Value.Importance)
+                        locker = enumerator.GetLocker();
                 }
-            }
 
-            return result;
+            return locker != null;
         }
     }
 }

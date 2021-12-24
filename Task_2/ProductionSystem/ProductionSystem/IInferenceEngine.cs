@@ -2,7 +2,7 @@ namespace ProductionSystem
 {
     internal interface IInferenceEngine
     {
-        bool Sort(IEnumerator<ILocker<IRule>> enumerator, IFactsProvider factsProvider);
+        bool Sort(ILockEnumerator<IRule> enumerator, IFactsProvider factsProvider);
 
         bool IsActive();
 
