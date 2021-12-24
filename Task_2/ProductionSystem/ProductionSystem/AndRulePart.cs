@@ -1,13 +1,13 @@
 namespace ProductionSystem
 {
-	public class AndRulePart : IRulePart
-	{
-		private IRulePart[] ruleParts;
+    public class AndRulePart : IRulePart
+    {
+        private IRulePart[] ruleParts;
 
-		public AndRulePart(IRulePart[] ruleParts)
-		{
-			this.ruleParts = ruleParts;
-		}
+        public AndRulePart(IRulePart[] ruleParts)
+        {
+            this.ruleParts = ruleParts;
+        }
 
         public Tuple<ExclusiveList<FixedFact>?, bool> Explain(IFactsProvider factsProvider)
         {

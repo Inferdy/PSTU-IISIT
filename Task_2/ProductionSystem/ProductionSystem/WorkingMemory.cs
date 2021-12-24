@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace ProductionSystem
 {
     public class WorkingMemory : IWorkingMemory

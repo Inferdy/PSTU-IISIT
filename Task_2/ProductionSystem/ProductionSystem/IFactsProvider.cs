@@ -1,7 +1,7 @@
 namespace ProductionSystem
 {
-	public interface IFactsProvider
-	{
-		FixedFact? GetFact(string name);
-	}
+    public interface IFactsProvider
+    {
+        FixedFact? GetFact(string name);
+    }
 }

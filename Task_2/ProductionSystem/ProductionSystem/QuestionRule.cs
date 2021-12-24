@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProductionSystem
+﻿namespace ProductionSystem
 {
     internal class QuestionRule : IRule
     {
@@ -42,7 +36,7 @@ namespace ProductionSystem
             {
                 logger.Print(enumerator.Current.Name + " = " + enumerator.Current.Value);
 
-                while(enumerator.MoveNext())
+                while (enumerator.MoveNext())
                 {
                     logger.Print(", ");
                     logger.Print(enumerator.Current.Name + " = " + enumerator.Current.Value);
