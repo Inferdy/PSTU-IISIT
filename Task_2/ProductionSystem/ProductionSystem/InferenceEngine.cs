@@ -4,9 +4,9 @@ namespace ProductionSystem
     {
         private ILocker<IRule>? locker = null;
 
-        public FixedFact? Infer(IPrinter printer, IAsker asker)
+        public FixedFact? Infer(IFactsProvider factsProvider, IPrinter printer, IPrinter logger, IAsker asker)
         {
-            FixedFact? fact = locker.Value.Activate(printer, asker);
+            FixedFact? fact = locker.Value.Activate(factsProvider, printer, logger, asker);
 
             locker.Lock();
             locker = null;

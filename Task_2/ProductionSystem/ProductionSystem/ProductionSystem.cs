@@ -19,15 +19,18 @@ namespace ProductionSystem
             engine = new InferenceEngine();
         }
 
-        public void Run(IPrinter printer, IAsker asker)
+        public void Run(IPrinter printer, IPrinter logger, IAsker asker)
         {
+            kb.Reset();
+            wm.Reset();
+
             FixedFact? fact;
 
             IEnumerator<ILocker<IRule>> enumerator = kb.GetEnumerator();
 
             while (engine.Sort(enumerator, wm))
             {
-                fact = engine.Infer(printer, asker);
+                fact = engine.Infer(wm, printer, logger, asker);
 
                 if (fact != null)
                     wm.SetFact(fact);

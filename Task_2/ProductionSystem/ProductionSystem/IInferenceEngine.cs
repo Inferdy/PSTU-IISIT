@@ -6,6 +6,6 @@ namespace ProductionSystem
 
 		bool IsActive();
 
-		FixedFact? Infer(IPrinter printer, IAsker asker);
+		FixedFact? Infer(IFactsProvider factsProvider, IPrinter printer, IPrinter logger, IAsker asker);
 	}
 }

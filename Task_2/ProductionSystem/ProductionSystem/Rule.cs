@@ -19,9 +19,30 @@ namespace ProductionSystem
             this.rootRulePart = rootRulePart;
         }
 
-        public FixedFact? Activate(IPrinter printer, IAsker asker)
+        public FixedFact? Activate(IFactsProvider factsProvider, IPrinter printer, IPrinter logger, IAsker asker)
         {
-            //TODO print
+            ExclusiveList<FixedFact>? list = rootRulePart.Explain(factsProvider).Item1;
+
+            if (list == null)
+                list = new ExclusiveList<FixedFact>();
+
+            IEnumerator<FixedFact> enumerator = list.GetEnumerator();
+
+            logger.Print("Rule \"" + RuleName + "\" (");
+
+            if (enumerator.MoveNext())
+            {
+                logger.Print(enumerator.Current.Name + " = " + enumerator.Current.Value);
+
+                while (enumerator.MoveNext())
+                {
+                    logger.Print(", ");
+                    logger.Print(enumerator.Current.Name + " = " + enumerator.Current.Value);
+                }
+            }
+
+            logger.Print(") => ");
+            logger.PrintLine(factName + " = " + factValue);
 
             return new FixedFact(factName, factValue);
         }
