@@ -138,7 +138,7 @@ namespace ProductionSystem
         private static IRulePart GetRulePart(this JsonElement jsonRulePart)
         {
             if (jsonRulePart.ValueKind != JsonValueKind.Object)
-                throw new WrongFormatException("Rule part expected to be string, got " + jsonRulePart.ValueKind);
+                throw new WrongFormatException("Rule part expected to be object, got " + jsonRulePart.ValueKind);
 
             string partType = jsonRulePart.GetString("t");
 
